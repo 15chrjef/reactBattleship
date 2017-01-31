@@ -7,7 +7,7 @@ export default class Board extends React.Component {
 		this.state = {
 			hits: 0,
 			board: []
-		}
+		} 
 	}
 	componentWillMount() {
 		this.generateBoard()
