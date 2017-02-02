@@ -1,79 +1,55 @@
 import React from 'react';
 import BoardCell from './BoardCell';
+import { WinMessage, ClickMessage } from './Messages';
 
 export default class Board extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 			hits: 0,
-			board: []
+			clicks: 0,
+			board: this.props.initialBoard,
+			winNumber: ''
 		} 
-	}
-	componentWillMount() {
-		this.generateBoard()
 	}
 	handleBoardClick(value, row, column) {
+		let { winNumber, clicks , hits } = this.state
 		var self = this;
-		if(value === 0) {
-			console.log('miss')
-		} else if(value === 1){
-			console.log('hit')
-			var newBoard = this.state.board.slice()
-			newBoard[row][column] = 2;
-			this.setState({
-				hits: ++this.state.hits,
-				board: newBoard
-			}, setTimeout(() => {
-				if(self.state.hits === 3) {
-					alert('done we have finished')
-				}
-			},10))
-		} 
+		clicks++
+		 if(value === 1){
+			 ++hits
+			 if(hits === 3) {
+				 winNumber = clicks
+			 }
+		}
+		this.setState({ hits, winNumber, clicks	})
 	}
-	generateBoard() {
-		const { rows, columns } = this.props
-		var myBoard = []
-		var ships = []
-		for( var x = 0; x < 3; x++) {
-			var randomRow = Math.floor(Math.random() * rows)
-			var randomColumn = Math.floor(Math.random() * columns)
-			ships.push(`${randomRow}${randomColumn}`)
-		}
-		for(var i = 0; i < rows; i++) {
-			myBoard.push([])
-			for( var j = 0; j < columns; j++) {
-				var randomNumber = 0;
-				if( ships.indexOf(`${i}${j}`) > -1) {
-					randomNumber = 1
-				}
-				myBoard[i].push(randomNumber)
-			}
-		}
-		this.setState({
-			board: myBoard
-		})
+	renderBoardUI() {
+		var newBoard = this.state.board.map((row, i) => 
+			<div key={i} style={{display: 'flex', flexDirection: 'row'}}>
+				{row.map((value, j) => 
+					<BoardCell 
+						key={`${i} + ${j}`}
+						row={i}
+						column={j}
+						handleBoardClick={this.handleBoardClick.bind(this)} 
+						value={value} 
+					/>
+				)}		
+			</div>
+		)
+		return newBoard
 	}
 	render() {
-		var boardUI = this.state.board.map((row, i) => {
-			return (
-				<div style={{display: 'flex', flexDirection: 'row'}}>
-					{row.map((value, j) => {
-						return(
-							<BoardCell 
-								key={`${i} + ${j}`}
-								row={i}
-								column={j}
-								handleBoardClick={this.handleBoardClick.bind(this)} 
-								value={value} 
-							/>
-						)
-					})}
-				</div>
-			)
-		})
+		const { winNumber } = this.state;
+		let boardUI=this.renderBoardUI()
+		let winMessage = typeof winNumber === 'number' ? <WinMessage/> : '';
+		let clickMessage = typeof winNumber === 'number' ?  <ClickMessage winNumber={winNumber}/> : '' ;
 		return(
-			<div>
-				{boardUI}
+			<div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
+				<div>{boardUI}</div>
+				<div>{winMessage}</div>
+				<div>{clickMessage}</div>
 			</div>
 		)
 	}

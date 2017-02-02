@@ -1,2 +1,2 @@
 # reactBattleship
-a game where the player has to choose the correct randomized locations to win the game.
+a fun game where the player has to choose the correct positions of enemy ships to win.
